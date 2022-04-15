@@ -37,3 +37,16 @@ export async function getCardBalance(req: Request, res: Response) {
   res.status(200).send(data)
 
 }
+
+export async function rechargeCard(req: Request, res: Response) {
+
+  const { id } = req.params
+  const cardId: number = parseInt(id)
+
+  const { amount } = req.body
+
+  await services.rechargeCard(cardId, amount)
+
+  res.sendStatus(200)
+
+}

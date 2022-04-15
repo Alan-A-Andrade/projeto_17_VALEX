@@ -4,9 +4,9 @@ import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as cardRepository from "../repositories/cardRepository.js"
 import * as paymentRepository from "../repositories/paymentRepository.js"
 import * as rechargeRepository from "../repositories/rechargeRepository.js"
+import { createHashData, compareHashData } from "../utils/hashUtils.js";
 import { faker } from '@faker-js/faker';
 import { default as dayjs } from 'dayjs'
-import bcrypt from 'bcrypt';
 
 export async function findCompanyByKey(apiKey: string) {
 
@@ -90,21 +90,7 @@ function generateExpirationDate(): string {
 
 }
 
-function createHashData(sensibleData: string): string {
 
-  const hash = bcrypt.hashSync(sensibleData, 10)
-
-  return hash
-
-}
-
-function compareHashData(sensibleData: string, hash: string): boolean {
-
-  const result = bcrypt.compareSync(sensibleData, hash)
-
-  return result
-
-}
 
 export async function createNewCard(employeeId: number, cardType: cardRepository.TransactionTypes) {
 
@@ -193,5 +179,20 @@ export async function getBalance(cardId: number) {
     transaction,
     recharges
   }
+
+}
+
+export async function rechargeCard(cardId: number, rechargeAmount: number) {
+
+  await findCardById(cardId)
+
+
+  if (rechargeAmount <= 0) {
+    throw { type: "Unprocessable_Entity" };
+  }
+
+  const rechargeData = { cardId, amount: rechargeAmount }
+
+  await rechargeRepository.insert(rechargeData)
 
 }
