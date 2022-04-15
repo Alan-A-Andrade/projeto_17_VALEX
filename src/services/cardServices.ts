@@ -5,6 +5,7 @@ import * as cardRepository from "../repositories/cardRepository.js"
 import * as paymentRepository from "../repositories/paymentRepository.js"
 import * as rechargeRepository from "../repositories/rechargeRepository.js"
 import { createHashData, compareHashData } from "../utils/hashUtils.js";
+import { sumValueByKey } from "../utils/financeUtils.js";
 import { faker } from '@faker-js/faker';
 import { default as dayjs } from 'dayjs'
 
@@ -115,7 +116,7 @@ export async function createNewCard(employeeId: number, cardType: cardRepository
 
 }
 
-async function findCardById(cardId: number) {
+export async function findCardById(cardId: number) {
 
   const cardData: cardRepository.Card = await cardRepository.findById(cardId)
 
@@ -127,20 +128,13 @@ async function findCardById(cardId: number) {
 
 }
 
-function isCardExpired(date: string): boolean {
+export function isCardExpired(date: string): boolean {
 
   const dateFormat = date.split("/")
 
   const isExpired = dayjs(`${dateFormat[0]}/31/${dateFormat[1]}`).isBefore(dayjs(Date.now()))
 
   return isExpired
-}
-
-async function checkSecurityCode(securityCode: string, hashData: string) {
-
-  const check = compareHashData(securityCode, hashData)
-
-  return check
 }
 
 export async function activateCard(cardId: number, securityCode: string, password: string) {
@@ -155,7 +149,7 @@ export async function activateCard(cardId: number, securityCode: string, passwor
     throw { type: "Conflict" };
   }
 
-  if (!checkSecurityCode(securityCode, card.securityCode)) {
+  if (!compareHashData(securityCode, card.securityCode)) {
     throw { type: "Unauthorized" };
   }
 
@@ -175,7 +169,14 @@ export async function getBalance(cardId: number) {
 
   const recharges = await rechargeRepository.findByCardId(cardId)
 
+  const totalTransaction: number = sumValueByKey(transaction, "amount")
+
+  const totalRecharge: number = sumValueByKey(recharges, "amount")
+
+  const balance: number = totalRecharge - totalTransaction
+
   return {
+    balance,
     transaction,
     recharges
   }

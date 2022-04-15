@@ -1,5 +1,5 @@
 import joi from "joi"
-import { cardPasswordPattern } from "../services/services.js";
+import { cardPasswordPattern } from "../services/cardServices.js";
 
 const activateCardSchema = joi.object({
   securityCode: joi.string().required().pattern(/^[0-9]{3}$/),
