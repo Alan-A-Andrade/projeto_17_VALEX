@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { findByApiKey } from "../repositories/companyRepository.js";
+import { findCompanyByKey } from "../services/services.js";
 
 export async function validateApiKey(req: Request, res: Response, next: NextFunction) {
 
@@ -9,13 +9,9 @@ export async function validateApiKey(req: Request, res: Response, next: NextFunc
     throw { type: "Bad_Request", message: "missing API Key at Headers Config" };
   }
 
-  const companyData = await findByApiKey(`${apiKey}`)
+  const company = await findCompanyByKey(apiKey)
 
-  if (!companyData) {
-    throw { type: "Unauthorized", message: "Unauthorized API Key" };
-  }
-
-  res.locals.company = companyData
+  res.locals.company = company
 
   next();
 }
