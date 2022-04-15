@@ -2,6 +2,8 @@
 import * as companyRepository from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as cardRepository from "../repositories/cardRepository.js"
+import * as paymentRepository from "../repositories/paymentRepository.js"
+import * as rechargeRepository from "../repositories/rechargeRepository.js"
 import { faker } from '@faker-js/faker';
 import { default as dayjs } from 'dayjs'
 import bcrypt from 'bcrypt';
@@ -17,18 +19,18 @@ export async function findCompanyByKey(apiKey: string) {
   return companyData
 }
 
-export async function findEmployeeById(employeeId: number) {
+async function findEmployeeById(employeeId: number) {
 
   const employeeData: employeeRepository.Employee = await employeeRepository.findById(employeeId)
 
   if (!employeeData) {
-    throw { type: "Unprocessable_Entity" };
+    throw { type: "Not_Found" };
   }
 
   return employeeData
 }
 
-export async function checkUniqueCardTypeByEmployee(employeeId: number, cardType: cardRepository.TransactionTypes) {
+async function checkUniqueCardTypeByEmployee(employeeId: number, cardType: cardRepository.TransactionTypes) {
 
   const cardData = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId)
 
@@ -37,7 +39,7 @@ export async function checkUniqueCardTypeByEmployee(employeeId: number, cardType
   }
 }
 
-export function generateCardInformation(employeeId: number, employeeName: string, cardType: cardRepository.TransactionTypes): cardRepository.CardInsertData {
+function generateCardInformation(employeeId: number, employeeName: string, cardType: cardRepository.TransactionTypes): cardRepository.CardInsertData {
 
   const cardholderName: string = generateCardHolderName(employeeName)
 
@@ -49,7 +51,7 @@ export function generateCardInformation(employeeId: number, employeeName: string
 
   const type = cardType
 
-  const isBlocked: boolean = true
+  const isBlocked: boolean = false
 
   return {
     employeeId,
@@ -124,5 +126,72 @@ export async function createNewCard(employeeId: number, cardType: cardRepository
   await cardRepository.insert(cardData)
 
   return cardDataReturn
+
+}
+
+async function findCardById(cardId: number) {
+
+  const cardData: cardRepository.Card = await cardRepository.findById(cardId)
+
+  if (!cardData) {
+    throw { type: "Not_Found" };
+  }
+
+  return cardData
+
+}
+
+function isCardExpired(date: string): boolean {
+
+  const dateFormat = date.split("/")
+
+  const isExpired = dayjs(`${dateFormat[0]}/31/${dateFormat[1]}`).isBefore(dayjs(Date.now()))
+
+  return isExpired
+}
+
+async function checkSecurityCode(securityCode: string, hashData: string) {
+
+  const check = compareHashData(securityCode, hashData)
+
+  return check
+}
+
+export async function activateCard(cardId: number, securityCode: string, password: string) {
+
+  const card = await findCardById(cardId)
+
+  if (card.password) {
+    throw { type: "Conflict" };
+  }
+
+  if (isCardExpired(card.expirationDate)) {
+    throw { type: "Conflict" };
+  }
+
+  if (!checkSecurityCode(securityCode, card.securityCode)) {
+    throw { type: "Unauthorized" };
+  }
+
+  card.password = createHashData(password)
+
+  await cardRepository.update(cardId, card)
+
+}
+
+export const cardPasswordPattern = /^[0-9]{4}$/
+
+export async function getBalance(cardId: number) {
+
+  await findCardById(cardId)
+
+  const transaction = await paymentRepository.findByCardId(cardId)
+
+  const recharges = await rechargeRepository.findByCardId(cardId)
+
+  return {
+    transaction,
+    recharges
+  }
 
 }
