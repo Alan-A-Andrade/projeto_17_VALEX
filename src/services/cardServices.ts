@@ -65,6 +65,10 @@ export async function activateCard(cardId: number, securityCode: string, passwor
 
   const card = await findCardById(cardId)
 
+  if (card.isVirtual) {
+    throw { type: "Bad_Request" };
+  }
+
   if (card.password) {
     throw { type: "Conflict" };
   }
@@ -109,8 +113,11 @@ export async function getBalance(cardId: number) {
 
 export async function rechargeCard(cardId: number, rechargeAmount: number) {
 
-  await findCardById(cardId)
+  const card = await findCardById(cardId)
 
+  if (card.isVirtual) {
+    throw { type: "Bad_Request" };
+  }
 
   if (rechargeAmount <= 0) {
     throw { type: "Unprocessable_Entity" };

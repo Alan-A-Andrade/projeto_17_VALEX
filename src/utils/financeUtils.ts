@@ -39,6 +39,31 @@ export function generateCardInformation(employeeId: number, employeeName: string
 
 }
 
+export function generateVirtualCardInformation(originalCard: cardRepository.Card): cardRepository.CardInsertData {
+
+  const { employeeId, cardholderName, password, type, id } = originalCard
+
+  const number: string = faker.finance.creditCardNumber('Mastercard')
+
+  const securityCode: string = faker.finance.creditCardCVV()
+
+  const expirationDate: string = generateExpirationDate()
+
+  return {
+    employeeId,
+    number,
+    cardholderName,
+    securityCode,
+    expirationDate,
+    password,
+    isVirtual: true,
+    originalCardId: id,
+    isBlocked: false,
+    type
+  }
+
+}
+
 function generateCardHolderName(name: string): string {
 
   const fullNameArray = name.split(" ")

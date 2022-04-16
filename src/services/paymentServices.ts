@@ -13,6 +13,10 @@ export async function posPayment(
 
   const card = await cardServices.findCardById(cardId)
 
+  if (card.isVirtual) {
+    throw { type: "Bad_Request" };
+  }
+
   if (financeUtils.isExpired(card.expirationDate)) {
     throw { type: "Conflict" };
   }
@@ -56,6 +60,10 @@ export async function onlinePayment(
 ) {
 
   const card = await cardServices.findCardByDetails(number, cardholderName, expirationDate)
+
+  if (card.isVirtual) {
+    card.id = card.originalCardId
+  }
 
   if (financeUtils.isExpired(card.expirationDate)) {
     throw { type: "Conflict" };
