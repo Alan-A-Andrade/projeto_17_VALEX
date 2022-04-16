@@ -1,11 +1,7 @@
-import * as companyRepository from "../repositories/companyRepository.js";
-import * as employeeRepository from "../repositories/employeeRepository.js";
-import * as cardRepository from "../repositories/cardRepository.js"
 import * as paymentRepository from "../repositories/paymentRepository.js"
-import * as rechargeRepository from "../repositories/rechargeRepository.js"
 import * as businessRepository from "../repositories/businessRepository.js"
 
-import { createHashData, compareHashData } from "../utils/hashUtils.js";
+import { compareHashData } from "../utils/hashUtils.js";
 import * as cardServices from "./cardServices.js"
 
 export async function purchaseOrder(cardId: number, password: string, businessId: number, amount: number) {
