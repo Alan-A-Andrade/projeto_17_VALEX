@@ -10,6 +10,8 @@ const errorLookupTable = {
 
 export function errorHandlingMiddleware(error, req: Request, res: Response, next: NextFunction) {
 
+  console.log(error)
+
   if (!error.message) {
     error.message = "An error as occurred"
   }

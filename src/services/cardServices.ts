@@ -49,6 +49,17 @@ export async function findCardById(cardId: number) {
 
 }
 
+export async function findCardByDetails(number: string, cardholderName: string, expirationDate: string) {
+  const cardData: cardRepository.Card = await cardRepository.findByCardDetails(number, cardholderName, expirationDate)
+
+  if (!cardData) {
+    throw { type: "Not_Found" };
+  }
+
+  return cardData
+
+}
+
 
 export async function activateCard(cardId: number, securityCode: string, password: string) {
 
