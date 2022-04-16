@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { findCompanyByKey } from "../services/cardServices.js";
+import { findCompanyByKey } from "../services/companyServices.js";
 
 export async function validateApiKey(req: Request, res: Response, next: NextFunction) {
 

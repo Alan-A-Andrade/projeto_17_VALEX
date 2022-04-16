@@ -1,26 +1,22 @@
 import * as paymentRepository from "../repositories/paymentRepository.js"
-import * as businessRepository from "../repositories/businessRepository.js"
-
-import { compareHashData } from "../utils/hashUtils.js";
 import * as cardServices from "./cardServices.js"
+import * as businessServices from "./businessServices.js"
+import * as hashUtils from "../utils/hashUtils.js";
+import * as financeUtils from "../utils/financeUtils.js"
 
-export async function purchaseOrder(cardId: number, password: string, businessId: number, amount: number) {
+export async function paymentOrder(cardId: number, password: string, businessId: number, amount: number) {
 
   const card = await cardServices.findCardById(cardId)
 
-  if (cardServices.isCardExpired(card.expirationDate)) {
+  if (financeUtils.isExpired(card.expirationDate)) {
     throw { type: "Conflict" };
   }
 
-  if (!compareHashData(password, card.password)) {
+  if (!hashUtils.compareHashData(password, card.password)) {
     throw { type: "Unauthorized" };
   }
 
-  const business = await businessRepository.findById(businessId)
-
-  if (!business) {
-    throw { type: "Unprocessable_Entity" };
-  }
+  const business = await businessServices.findBusinessById(businessId)
 
   if (card.type !== business.type) {
     throw { type: "Unauthorized" };

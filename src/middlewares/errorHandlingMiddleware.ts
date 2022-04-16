@@ -20,5 +20,4 @@ export function errorHandlingMiddleware(error, req: Request, res: Response, next
 
   return res.status(errorLookupTable[error.type]).send(error.message);
 
-
 }

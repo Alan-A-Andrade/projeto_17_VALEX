@@ -50,3 +50,31 @@ export async function rechargeCard(req: Request, res: Response) {
   res.sendStatus(200)
 
 }
+
+export async function blockCard(req: Request, res: Response) {
+
+  const { id } = req.params
+  const cardId: number = parseInt(id)
+
+  const { password } = req.body
+
+  await cardServices.blockCard(cardId, password)
+
+  res.sendStatus(200)
+
+
+}
+
+export async function unblockCard(req: Request, res: Response) {
+
+  const { id } = req.params
+  const cardId: number = parseInt(id)
+
+  const { password } = req.body
+
+  await cardServices.unblockCard(cardId, password)
+
+  res.sendStatus(200)
+
+
+}
