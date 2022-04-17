@@ -7,6 +7,9 @@ export async function createNewVirtualCard(originalCardId: number, password: str
 
   const originalCard = await cardServices.findCardById(originalCardId)
 
+  if (!originalCard.password) {
+    throw { type: "Bad_Request" };
+  }
 
   if (!hashUtils.compareHashData(password, originalCard.password)) {
     throw { type: "Unauthorized" };

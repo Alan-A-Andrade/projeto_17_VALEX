@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { findCompanyByKey } from "../services/companyServices.js";
 
-export async function validateApiKey(req: Request, res: Response, next: NextFunction) {
+export default async function validateApiKey(req: Request, res: Response, next: NextFunction) {
 
   const apiKey = req.headers["x-api-key"] as string
 

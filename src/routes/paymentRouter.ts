@@ -1,13 +1,21 @@
 import { Router } from "express";
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
-import posPaymentSchema from "../schemas/posPaymentSchema.js";
-import onlinePaymentSchema from "../schemas/onlinePaymentSchema.js";
-import { posPayment, onlinePayment } from "../controllers/paymentsController.js";
+import * as paymentsController from "../controllers/paymentsController.js";
+import * as schemas from "../schemas/index.js"
 
 const paymentRouter: Router = Router()
 
-paymentRouter.post('/payment/pos', validateSchemaMiddleware(posPaymentSchema), posPayment)
-paymentRouter.post('/payment/online', validateSchemaMiddleware(onlinePaymentSchema), onlinePayment)
+paymentRouter.post(
+  '/payment/pos',
+  validateSchemaMiddleware(schemas.posPaymentSchema),
+  paymentsController.posPayment
+)
+
+paymentRouter.post(
+  '/payment/online',
+  validateSchemaMiddleware(schemas.onlinePaymentSchema),
+  paymentsController.onlinePayment
+)
 
 
 export default paymentRouter

@@ -10,7 +10,13 @@ export function sumValueByKey(array: any[], key: string): number {
   return keyValues.reduce((current: number, sum: number) => sum + current, 0);
 }
 
-export function generateCardInformation(employeeId: number, employeeName: string, cardType: cardRepository.TransactionTypes): cardRepository.CardInsertData {
+export function generateCardInformation(
+
+  employeeId: number,
+  employeeName: string,
+  cardType: cardRepository.TransactionTypes
+
+): cardRepository.CardInsertData {
 
   const cardholderName: string = generateCardHolderName(employeeName)
 
@@ -43,7 +49,17 @@ export function generateVirtualCardInformation(originalCard: cardRepository.Card
 
   const { employeeId, cardholderName, password, type, id } = originalCard
 
-  const number: string = faker.finance.creditCardNumber('Mastercard')
+
+  //As Faker random credit card number can generate a wrong starting number for masterCard, this assures will start with 5
+
+  let check: boolean = false
+  let num: string = ""
+  do {
+    num = faker.finance.creditCardNumber('mastercard')
+    check = num[0] === "5"
+  } while (!check)
+
+  const number: string = num
 
   const securityCode: string = faker.finance.creditCardCVV()
 

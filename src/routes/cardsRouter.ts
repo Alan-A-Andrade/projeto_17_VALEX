@@ -1,25 +1,47 @@
 import { Router } from "express";
-import newCardSchema from "../schemas/newCardSchema.js";
-import activateCardSchema from "../schemas/activateCardSchema.js";
-import rechargeCardSchema from "../schemas/rechargeCardSchema.js";
-import passwordSchema from "../schemas/passwordCardSchema.js";
-import { validateApiKey } from "../middlewares/apiKeyMiddleware.js";
-import { createNewCard, activateCard, getCardBalance, rechargeCard, blockCard, unblockCard } from "../controllers/cardsController.js";
+import * as schemas from "../schemas/index.js"
+import * as cardsController from "../controllers/cardsController.js";
+
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
+import validateApiKey from "../middlewares/apiKeyMiddleware.js";
 
 const cardRouter: Router = Router()
 
-cardRouter.post('/cards', validateApiKey, validateSchemaMiddleware(newCardSchema), createNewCard)
+cardRouter.post(
+  '/cards',
+  validateApiKey,
+  validateSchemaMiddleware(schemas.newCardSchema),
+  cardsController.createNewCard
+)
 
-cardRouter.get('/cards/:id', getCardBalance)
+cardRouter.get(
+  '/cards/:id',
+  cardsController.getCardBalance
+)
 
-cardRouter.put('/cards/:id/activate', validateSchemaMiddleware(activateCardSchema), activateCard)
+cardRouter.put(
+  '/cards/:id/activate',
+  validateSchemaMiddleware(schemas.activateCardSchema),
+  cardsController.activateCard
+)
 
-cardRouter.post('/cards/:id/recharge', validateApiKey, validateSchemaMiddleware(rechargeCardSchema), rechargeCard)
+cardRouter.post(
+  '/cards/:id/recharge',
+  validateApiKey,
+  validateSchemaMiddleware(schemas.rechargeCardSchema),
+  cardsController.rechargeCard
+)
 
-cardRouter.put('/cards/:id/block', validateSchemaMiddleware(passwordSchema), blockCard)
+cardRouter.put(
+  '/cards/:id/block',
+  validateSchemaMiddleware(schemas.passwordSchema),
+  cardsController.blockCard
+)
 
-cardRouter.put('/cards/:id/unblock', validateSchemaMiddleware(passwordSchema), unblockCard)
-
+cardRouter.put(
+  '/cards/:id/unblock',
+  validateSchemaMiddleware(schemas.passwordSchema),
+  cardsController.unblockCard
+)
 
 export default cardRouter

@@ -1,13 +1,20 @@
 import { Router } from "express";
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
-import newVirtualCardSchema from "../schemas/newVirtualCardSchema.js";
-import { createNewVirtualCard, deleteVirtualCard } from "../controllers/virtualCardsController.js";
-import passwordSchema from "../schemas/passwordCardSchema.js";
+import * as virtualCardsController from "../controllers/virtualCardsController.js";
+import * as schemas from "../schemas/index.js"
 
 const virtualCardRouter: Router = Router()
 
-virtualCardRouter.post('/virtualCard', validateSchemaMiddleware(newVirtualCardSchema), createNewVirtualCard)
+virtualCardRouter.post(
+  '/virtualCard',
+  validateSchemaMiddleware(schemas.newVirtualCardSchema),
+  virtualCardsController.createNewVirtualCard
+)
 
-virtualCardRouter.delete('/virtualCard/:id', validateSchemaMiddleware(passwordSchema), deleteVirtualCard)
+virtualCardRouter.delete(
+  '/virtualCard/:id',
+  validateSchemaMiddleware(schemas.passwordSchema),
+  virtualCardsController.deleteVirtualCard
+)
 
 export default virtualCardRouter
