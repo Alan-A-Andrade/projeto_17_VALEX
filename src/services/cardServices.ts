@@ -118,11 +118,18 @@ export async function getBalance(
   cardId: number
 ) {
 
-  await findCardById(cardId)
+  const card = await findCardById(cardId)
 
-  const transaction = await paymentRepository.findByCardId(cardId)
+  let id = card.id
 
-  const recharges = await rechargeRepository.findByCardId(cardId)
+  if (card.isVirtual) {
+
+    id = card.originalCardId
+  }
+
+  const transaction = await paymentRepository.findByCardId(id)
+
+  const recharges = await rechargeRepository.findByCardId(id)
 
   const totalTransaction: number = financeUtils.sumValueByKey(transaction, "amount")
 
