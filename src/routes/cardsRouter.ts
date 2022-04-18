@@ -1,7 +1,6 @@
 import { Router } from "express";
 import * as schemas from "../schemas/index.js"
 import * as cardsController from "../controllers/cardsController.js";
-
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
 import validateApiKey from "../middlewares/apiKeyMiddleware.js";
 
