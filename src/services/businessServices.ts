@@ -5,7 +5,7 @@ export async function findBusinessById(businessId: number) {
   const businessData = await businessRepository.findById(businessId)
 
   if (!businessData) {
-    throw { type: "Unprocessable_Entity" };
+    throw { type: "Not_Found" };
   }
 
   return businessData

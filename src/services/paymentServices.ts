@@ -14,17 +14,16 @@ export async function posPayment(
   const card = await cardServices.findCardById(cardId)
 
   if (card.isVirtual) {
-    throw { type: "Bad_Request" };
+    throw { type: "Conflict", message: "Transaction is not allowed in virtual cards" };
   }
 
   if (financeUtils.isExpired(card.expirationDate)) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card has expired" };
   }
 
   if (!hashUtils.compareHashData(password, card.password)) {
     throw { type: "Unauthorized" };
   }
-
 
   if (card.isBlocked) {
     throw { type: "Unauthorized" };
@@ -33,17 +32,17 @@ export async function posPayment(
   const business = await businessServices.findBusinessById(businessId)
 
   if (card.type !== business.type) {
-    throw { type: "Unauthorized" };
+    throw { type: "Unauthorized", message: "Transaction is not allowed in this card type" };
   }
 
   if (amount <= 0) {
-    throw { type: "Unprocessable_Entity" };
+    throw { type: "Conflict", message: "Transaction amount must be greater than 0" };
   }
 
   const cardInfo = await cardServices.getBalance(cardId)
 
   if (cardInfo.balance < amount) {
-    throw { type: "Unauthorized" };
+    throw { type: "Unauthorized", message: "Card balance is lower than transaction amount" };
   }
 
   await paymentRepository.insert({ cardId, businessId, amount })
@@ -66,7 +65,7 @@ export async function onlinePayment(
   }
 
   if (financeUtils.isExpired(card.expirationDate)) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card has expired" };
   }
 
   if (!hashUtils.compareHashData(securityCode, card.securityCode)) {
@@ -80,17 +79,17 @@ export async function onlinePayment(
   const business = await businessServices.findBusinessById(businessId)
 
   if (card.type !== business.type) {
-    throw { type: "Unauthorized" };
+    throw { type: "Unauthorized", message: "Transaction is not allowed in this card type" };
   }
 
   if (amount <= 0) {
-    throw { type: "Unprocessable_Entity" };
+    throw { type: "Conflict", message: "Transaction amount must be greater than 0" };
   }
 
   const cardInfo = await cardServices.getBalance(card.id)
 
   if (cardInfo.balance < amount) {
-    throw { type: "Unauthorized" };
+    throw { type: "Unauthorized", message: "Card balance is lower than transaction amount" };
   }
 
   await paymentRepository.insert({ cardId: card.id, businessId, amount })

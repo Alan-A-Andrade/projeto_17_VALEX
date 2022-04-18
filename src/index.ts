@@ -3,7 +3,7 @@ import "express-async-errors"
 import cors from 'cors';
 import dotenv from 'dotenv'
 import router from './routes/index.js';
-import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js';
+import errorHandlingMiddleware from './middlewares/errorHandlingMiddleware.js';
 
 const app = express();
 

@@ -8,7 +8,7 @@ export async function createNewVirtualCard(originalCardId: number, password: str
   const originalCard = await cardServices.findCardById(originalCardId)
 
   if (!originalCard.password) {
-    throw { type: "Bad_Request" };
+    throw { type: "Bad_Request", message: "Cannot create a virtual card from a non active card" };
   }
 
   if (!hashUtils.compareHashData(password, originalCard.password)) {
@@ -37,7 +37,7 @@ export async function deleteVirtualCard(cardId: number, password: string) {
   const card = await cardServices.findCardById(cardId)
 
   if (!card.isVirtual) {
-    throw { type: "Bad_Request" };
+    throw { type: "Conflict", message: "Cannot delete a non virtual card" };
   }
 
   if (!hashUtils.compareHashData(password, card.password)) {

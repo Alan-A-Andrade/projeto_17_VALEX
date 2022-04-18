@@ -66,15 +66,15 @@ export async function activateCard(cardId: number, securityCode: string, passwor
   const card = await findCardById(cardId)
 
   if (card.isVirtual) {
-    throw { type: "Bad_Request" };
+    throw { type: "Bad_Request", message: "Only non virtual cards can be activated" };
   }
 
   if (card.password) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card is already activate" };
   }
 
   if (financeUtils.isExpired(card.expirationDate)) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card has expired" };
   }
 
   if (!hashUtils.compareHashData(securityCode, card.securityCode)) {
@@ -116,11 +116,11 @@ export async function rechargeCard(cardId: number, rechargeAmount: number) {
   const card = await findCardById(cardId)
 
   if (card.isVirtual) {
-    throw { type: "Bad_Request" };
+    throw { type: "Bad_Request", message: "Only non virtual cards can be recharged" };
   }
 
   if (rechargeAmount <= 0) {
-    throw { type: "Unprocessable_Entity" };
+    throw { type: "Unprocessable_Entity", message: "Recharge amount must be greater than 0" };
   }
 
   const rechargeData = { cardId, amount: rechargeAmount }
@@ -136,11 +136,11 @@ export async function blockCard(cardId: number, password: string) {
   const card = await findCardById(cardId)
 
   if (card.isBlocked) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card is already blocked" };
   }
 
   if (financeUtils.isExpired(card.expirationDate)) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card has expired" };
   }
 
   if (!hashUtils.compareHashData(password, card.password)) {
@@ -158,11 +158,11 @@ export async function unblockCard(cardId: number, password: string) {
   const card = await findCardById(cardId)
 
   if (!card.isBlocked) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card is already unblocked" };
   }
 
   if (financeUtils.isExpired(card.expirationDate)) {
-    throw { type: "Conflict" };
+    throw { type: "Conflict", message: "Card has expired" };
   }
 
   if (!hashUtils.compareHashData(password, card.password)) {

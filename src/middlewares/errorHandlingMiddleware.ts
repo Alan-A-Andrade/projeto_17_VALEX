@@ -8,9 +8,7 @@ const errorLookupTable = {
   Conflict: 409,
 }
 
-export function errorHandlingMiddleware(error, req: Request, res: Response, next: NextFunction) {
-
-  console.log(error)
+export default function errorHandlingMiddleware(error, req: Request, res: Response, next: NextFunction) {
 
   if (!error.message) {
     error.message = "An error as occurred"
