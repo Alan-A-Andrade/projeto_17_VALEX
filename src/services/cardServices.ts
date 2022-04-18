@@ -5,7 +5,10 @@ import * as employeeServices from "./employeeServices.js"
 import * as hashUtils from "../utils/hashUtils.js";
 import * as financeUtils from "../utils/financeUtils.js"
 
-async function checkUniqueCardTypeByEmployee(employeeId: number, cardType: cardRepository.TransactionTypes) {
+async function checkUniqueCardTypeByEmployee(
+  employeeId: number,
+  cardType: cardRepository.TransactionTypes
+) {
 
   const cardData = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId)
 
@@ -14,13 +17,16 @@ async function checkUniqueCardTypeByEmployee(employeeId: number, cardType: cardR
   }
 }
 
-export async function createNewCard(employeeId: number, cardType: cardRepository.TransactionTypes) {
+export async function createNewCard(
+  employeeId: number,
+  cardType: cardRepository.TransactionTypes
+) {
 
   const employee = await employeeServices.findEmployeeById(employeeId)
 
   await checkUniqueCardTypeByEmployee(employeeId, cardType)
 
-  const cardData: cardRepository.CardInsertData = financeUtils.generateCardInformation(employee.id, employee.fullName, cardType)
+  const cardData = financeUtils.generateCardInformation(employee.id, employee.fullName, cardType)
 
   const cardDataReturn = {
     cardholderName: cardData.cardholderName,
@@ -37,7 +43,9 @@ export async function createNewCard(employeeId: number, cardType: cardRepository
 
 }
 
-export async function findCardById(cardId: number) {
+export async function findCardById(
+  cardId: number
+) {
 
   const cardData: cardRepository.Card = await cardRepository.findById(cardId)
 
@@ -49,7 +57,10 @@ export async function findCardById(cardId: number) {
 
 }
 
-export async function findCardByDetails(number: string, cardholderName: string, expirationDate: string) {
+export async function findCardByDetails(
+  number: string,
+  cardholderName: string,
+  expirationDate: string) {
   const cardData: cardRepository.Card = await cardRepository.findByCardDetails(number, cardholderName, expirationDate)
 
   if (!cardData) {
@@ -60,25 +71,39 @@ export async function findCardByDetails(number: string, cardholderName: string, 
 
 }
 
+export async function activateCard(
+  cardId: number,
+  securityCode: string,
+  password: string
+) {
 
-export async function activateCard(cardId: number, securityCode: string, password: string) {
-
-  const card = await findCardById(cardId)
+  const card: cardRepository.Card = await findCardById(cardId)
 
   if (card.isVirtual) {
-    throw { type: "Bad_Request", message: "Only non virtual cards can be activated" };
+    throw {
+      type: "Bad_Request",
+      message: "Only non virtual cards can be activated"
+    };
   }
 
   if (card.password) {
-    throw { type: "Conflict", message: "Card is already activate" };
+    throw {
+      type: "Conflict",
+      message: "Card is already activate"
+    };
   }
 
   if (financeUtils.isExpired(card.expirationDate)) {
-    throw { type: "Conflict", message: "Card has expired" };
+    throw {
+      type: "Conflict",
+      message: "Card has expired"
+    };
   }
 
   if (!hashUtils.compareHashData(securityCode, card.securityCode)) {
-    throw { type: "Unauthorized" };
+    throw {
+      type: "Unauthorized"
+    };
   }
 
   card.password = hashUtils.createHashData(password)
@@ -89,7 +114,9 @@ export async function activateCard(cardId: number, securityCode: string, passwor
 
 export const cardPasswordPattern = /^[0-9]{4}$/
 
-export async function getBalance(cardId: number) {
+export async function getBalance(
+  cardId: number
+) {
 
   await findCardById(cardId)
 
@@ -111,7 +138,10 @@ export async function getBalance(cardId: number) {
 
 }
 
-export async function rechargeCard(cardId: number, rechargeAmount: number) {
+export async function rechargeCard(
+  cardId: number,
+  rechargeAmount: number
+) {
 
   const card = await findCardById(cardId)
 
@@ -129,9 +159,10 @@ export async function rechargeCard(cardId: number, rechargeAmount: number) {
 
 }
 
-
-
-export async function blockCard(cardId: number, password: string) {
+export async function blockCard(
+  cardId: number,
+  password: string
+) {
 
   const card = await findCardById(cardId)
 
@@ -153,7 +184,10 @@ export async function blockCard(cardId: number, password: string) {
 
 }
 
-export async function unblockCard(cardId: number, password: string) {
+export async function unblockCard(
+  cardId: number,
+  password: string
+) {
 
   const card = await findCardById(cardId)
 
